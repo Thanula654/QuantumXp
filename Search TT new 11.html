@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Engine with Settings</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background 0.8s ease, color 0.5s ease;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Animated background particles */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            top: -50%;
+            left: -50%;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        body.light {
+            animation: gradientBackgroundLight 15s ease infinite;
+            background: linear-gradient(-45deg, #ee3c3c, #eeeb18, #ee3c3c, #4dee42, #e315fa, #1505fb);
+            background-size: 400% 400%;
+            color: #fff;
+        }
+
+        body.light::before {
+            background: radial-gradient(circle, rgba(255,255,255,0.3) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: particleFloat 20s linear infinite;
+        }
+
+        body.dark {
+            animation: gradientBackgroundDark 15s ease infinite;
+            background: linear-gradient(-45deg, #060627, #1505fb, #080440, #2708ee, #0a0a3a, #1a0f5f);
+            background-size: 400% 400%;
+            color: #fff;
+        }
+
+        body.dark::before {
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 2px, transparent 2px);
+            background-size: 60px 60px;
+            animation: particleFloat 25s linear infinite reverse;
+        }
+
+        @keyframes gradientBackgroundLight {
+            0% {
+                background-position: 0% 50%;
+            }
+            25% {
+                background-position: 50% 25%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            75% {
+                background-position: 50% 75%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        @keyframes gradientBackgroundDark {
+            0% {
+                background-position: 0% 50%;
+            }
+            33% {
+                background-position: 100% 25%;
+            }
+            66% {
+                background-position: 0% 75%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        @keyframes particleFloat {
+            0% {
+                transform: translateY(0) rotate(0deg);
+            }
+            100% {
+                transform: translateY(-100%) rotate(360deg);
+            }
+        }
+
+        .main-container {
+            width: 90%;
+            max-width: 800px;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo {
+            font-size: 3.5em;
+            font-weight: bold;
+            margin-bottom: 30px;
+            animation: fadeInBounce 1.2s ease, float 4s ease-in-out infinite;
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.6),
+                         0 0 60px rgba(255, 255, 255, 0.4);
+            background: linear-gradient(45deg, #fff, #f0f0f0, #fff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            background-size: 200% 200%;
+            animation: fadeInBounce 1.2s ease, float 4s ease-in-out infinite, shimmer 3s ease infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        @keyframes fadeInBounce {
+            0% {
+                opacity: 0;
+                transform: translateY(-80px) scale(0.8);
+            }
+            60% {
+                opacity: 1;
+                transform: translateY(15px) scale(1.05);
+            }
+            80% {
+                transform: translateY(-8px) scale(0.98);
+            }
+            100% {
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px) scale(1);
+            }
+            50% {
+                transform: translateY(-15px) scale(1.02);
+            }
+        }
+
+        .search-container {
+            position: relative;
+            margin-bottom: 20px;
+            animation: slideInUp 1s ease;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 20px 130px 20px 55px;
+            border-radius: 50px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            font-size: 1.1em;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4),
+                        inset 0 2px 10px rgba(255, 255, 255, 0.1);
+            transition: all 0.4s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        body.light .search-box {
+            background: rgba(255, 255, 255, 0.25);
+            color: #fff;
+        }
+
+        body.dark .search-box {
+            background: rgba(10, 10, 50, 0.6);
+            color: #fff;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.6);
+            box-shadow: 0 12px 40px rgba(102, 126, 234, 0.6),
+                        0 0 30px rgba(255, 255, 255, 0.3),
+                        inset 0 2px 15px rgba(255, 255, 255, 0.2);
+            transform: scale(1.03);
+            animation: glowPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes glowPulse {
+            0%, 100% {
+                box-shadow: 0 12px 40px rgba(102, 126, 234, 0.6),
+                            0 0 30px rgba(255, 255, 255, 0.3),
+                            inset 0 2px 15px rgba(255, 255, 255, 0.2);
+            }
+            50% {
+                box-shadow: 0 12px 50px rgba(102, 126, 234, 0.8),
+                            0 0 40px rgba(255, 255, 255, 0.5),
+                            inset 0 2px 20px rgba(255, 255, 255, 0.3);
+            }
+        }
+
+        .search-box::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 22px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.4em;
+            opacity: 0.8;
+            animation: iconPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes iconPulse {
+            0%, 100% {
+                opacity: 0.8;
+                transform: translateY(-50%) scale(1);
+            }
+            50% {
+                opacity: 1;
+                transform: translateY(-50%) scale(1.1);
+            }
+        }
+
+        .button-group {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            gap: 10px;
+        }
+
+        .icon-button {
+            width: 48px;
+            height: 48px;
+            border: none;
+            border-radius: 50%;
+            font-size: 1.4em;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .icon-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.5s, height 0.5s;
+        }
+
+        .icon-button:hover::before {
+            width: 100px;
+            height: 100px;
+        }
+
+        body.light .icon-button {
+            background: rgba(255, 255, 255, 0.3);
+            color: #fff;
+            backdrop-filter: blur(10px);
+        }
+
+        body.dark .icon-button {
+            background: rgba(30, 30, 80, 0.8);
+            color: #fff;
+            backdrop-filter: blur(10px);
+        }
+
+        .icon-button:hover {
+            transform: scale(1.2) rotate(15deg);
+            box-shadow: 0 8px 30px rgba(102, 126, 234, 0.6);
+        }
+
+        .icon-button:active {
+            transform: scale(0.95) rotate(0deg);
+        }
+
+        .settings-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            color: white !important;
+        }
+
+        .settings-button:hover {
+            animation: spinGlow 1s ease;
+        }
+
+        @keyframes spinGlow {
+            0%, 100% {
+                transform: scale(1.2) rotate(0deg);
+                box-shadow: 0 8px 30px rgba(102, 126, 234, 0.6);
+            }
+            50% {
+                transform: scale(1.2) rotate(360deg);
+                box-shadow: 0 12px 50px rgba(102, 126, 234, 0.9),
+                            0 0 30px rgba(118, 75, 162, 0.6);
+            }
+        }
+
+        /* Settings Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(8px);
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .settings-panel {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 30px;
+            max-width: 450px;
+            max-height: 85vh;
+            width: 90%;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5),
+                        inset 0 1px 1px rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            transform: scale(0.7) translateY(-50px);
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .settings-panel::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .settings-panel::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .settings-panel::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+        }
+
+        .settings-panel::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        }
+
+        .modal-overlay.active .settings-panel {
+            transform: scale(1) translateY(0);
+            opacity: 1;
+        }
+
+        body.light .settings-panel {
+            background: rgba(255, 255, 255, 0.35);
+        }
+
+        body.dark .settings-panel {
+            background: rgba(20, 20, 60, 0.85);
+        }
+
+        .settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            animation: fadeInDown 0.6s ease;
+            position: sticky;
+            top: 0;
+            background: inherit;
+            backdrop-filter: blur(20px);
+            padding-bottom: 10px;
+            z-index: 10;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .settings-header h2 {
+            font-size: 1.6em;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .close-button {
+            width: 38px;
+            height: 38px;
+            border: none;
+            border-radius: 50%;
+            font-size: 1.6em;
+            cursor: pointer;
+            background: rgba(255, 50, 50, 0.3);
+            color: inherit;
+            transition: all 0.4s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .close-button:hover {
+            background: rgba(255, 50, 50, 0.6);
+            transform: rotate(180deg) scale(1.1);
+            box-shadow: 0 5px 20px rgba(255, 50, 50, 0.5);
+        }
+
+        .setting-group {
+            margin-bottom: 18px;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 15px;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            text-align: left;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .setting-group:hover {
+            transform: translateX(8px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(102, 126, 234, 0.4);
+        }
+
+        .setting-group.animate {
+            animation: slideInBounce 0.8s ease;
+        }
+
+        @keyframes slideInBounce {
+            0% {
+                opacity: 0;
+                transform: translateX(-80px);
+            }
+            60% {
+                opacity: 1;
+                transform: translateX(15px);
+            }
+            80% {
+                transform: translateX(-5px);
+            }
+            100% {
+                transform: translateX(0);
+            }
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 1em;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+            color: inherit;
+            font-size: 0.95em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        select:hover {
+            border-color: rgba(102, 126, 234, 0.6);
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.6);
+            transform: scale(1.02);
+        }
+
+        body.light select {
+            background: rgba(255, 255, 255, 0.4);
+            border-color: rgba(255, 255, 255, 0.4);
+            color: #fff;
+        }
+
+        body.dark select {
+            background: rgba(30, 30, 80, 0.6);
+            border-color: rgba(100, 100, 200, 0.4);
+            color: #fff;
+        }
+
+        .icon {
+            margin-right: 8px;
+            font-size: 1.1em;
+        }
+
+        .status {
+            text-align: center;
+            margin-top: 18px;
+            padding: 14px;
+            background: rgba(102, 126, 234, 0.25);
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.9em;
+            animation: statusPulse 2.5s infinite;
+            border: 1px solid rgba(102, 126, 234, 0.4);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        @keyframes statusPulse {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+                box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+            }
+            50% {
+                opacity: 0.85;
+                transform: scale(1.02);
+                box-shadow: 0 8px 30px rgba(102, 126, 234, 0.5);
+            }
+        }
+
+        .test-button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 0.9em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .test-button:hover {
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 0 6px 25px rgba(102, 126, 234, 0.6);
+        }
+
+        .test-button:active {
+            transform: translateY(-1px) scale(1.01);
+        }
+
+        .search-engine-display {
+            margin-top: 15px;
+            padding: 12px;
+            background: rgba(102, 126, 234, 0.15);
+            border-radius: 10px;
+            font-size: 1em;
+            text-align: center;
+            animation: fadeInUp 1.2s ease;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Footer */
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px;
+            text-align: center;
+            font-size: 1em;
+            font-weight: 600;
+            backdrop-filter: blur(15px);
+            background: rgba(0, 0, 0, 0.3);
+            border-top: 2px solid rgba(255, 255, 255, 0.2);
+            animation: slideUp 1s ease;
+            z-index: 10;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .footer-text {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            animation: fadeIn 1.5s ease;
+        }
+
+        .footer-heart {
+            color: #ff6b6b;
+            animation: heartbeat 1.5s ease-in-out infinite;
+            font-size: 1.3em;
+            filter: drop-shadow(0 0 10px #ff6b6b);
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { 
+                transform: scale(1); 
+            }
+            10%, 30% { 
+                transform: scale(1.3); 
+            }
+            20%, 40% { 
+                transform: scale(1.1); 
+            }
+        }
+
+        .footer-name {
+            font-weight: 700;
+            font-size: 1.1em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%, #667eea 200%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            background-size: 200% 200%;
+            animation: nameShimmer 4s ease-in-out infinite;
+            filter: drop-shadow(0 0 15px rgba(102, 126, 234, 0.6));
+        }
+
+        @keyframes nameShimmer {
+            0%, 100% { 
+                background-position: 0% 50%;
+                opacity: 1;
+            }
+            50% { 
+                background-position: 100% 50%;
+                opacity: 0.8;
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body class="light">
+    <div class="main-container">
+        <div class="logo">🔍 Search</div>
+        
+        <div class="search-container">
+            <span class="search-icon">🔎</span>
+            <input type="text" class="search-box" placeholder="Enter your search..." id="searchInput">
+            <div class="button-group">
+                <button class="icon-button" onclick="performSearch()" title="Search">
+                    ➤
+                </button>
+                <button class="icon-button settings-button" onclick="openSettings()" title="Settings">
+                    ⚙️
+                </button>
+            </div>
+        </div>
+
+        <div class="search-engine-display" id="engineDisplay">
+            Current Search Engine: Google 🌐
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div class="footer-text">
+            <span>Made with</span>
+            <span class="footer-heart">HTML</span>
+            <span>by</span>
+            <span class="footer-name">Thanula Thasmitha</span>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal-overlay" id="settingsModal">
+        <div class="settings-panel">
+            <div class="settings-header">
+                <h2>⚙️ Settings</h2>
+                <button class="close-button" onclick="closeSettings()">×</button>
+            </div>
+            
+            <div class="setting-group">
+                <label for="theme"><span class="icon">🌓</span>Theme</label>
+                <select id="theme">
+                    <option value="light">Light Mode</option>
+                    <option value="dark">Dark Mode</option>
+                </select>
+            </div>
+
+            <div class="setting-group">
+                <label for="animation"><span class="icon">✨</span>Animation</label>
+                <select id="animation">
+                    <option value="on">Enabled</option>
+                    <option value="off">Disabled</option>
+                </select>
+            </div>
+
+            <div class="setting-group">
+                <label for="sound"><span class="icon">🔊</span>Sound</label>
+                <select id="sound">
+                    <option value="on">Enabled</option>
+                    <option value="off">Disabled</option>
+                </select>
+                <button class="test-button" onclick="testSound()">Test Sound</button>
+            </div>
+
+            <div class="setting-group">
+                <label for="language"><span class="icon">🌐</span>Language</label>
+                <select id="language">
+                    <option value="si">Sinhala</option>
+                    <option value="en">English</option>
+                </select>
+            </div>
+
+            <div class="setting-group">
+                <label for="search"><span class="icon">🔍</span>Search Engine</label>
+                <select id="search">
+                    <option value="google">Google</option>
+                    <option value="bing">Bing</option>
+                    <option value="duckduckgo">DuckDuckGo</option>
+                    <option value="yahoo">Yahoo</option>
+                </select>
+            </div>
+
+            <div class="status" id="status">
+                All settings configured ✓
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const settings = {
+            theme: 'Dark',
+            animation: 'on',
+            sound: 'on',
+            search: 'google',
+            language: 'en'
+        };
+
+        const translations = {
+            si: {
+                logo: 'සෙවීම',
+                searchPlaceholder: 'සෙවීමට ඇතුළත් කරන්න...',
+                engineDisplay: 'වත්මන් සෙවුම් එන්ජිම',
+                settingsTitle: '⚙️ සැකසුම්',
+                theme: '🌓 තේමාව',
+                themeLight: 'ආලෝක මාදිලිය',
+                themeDark: 'අඳුරු මාදිලිය',
+                animation: '✨ සජීවිකරණ',
+                animationOn: 'සක්‍රීය',
+                animationOff: 'අක්‍රීය',
+                sound: '🔊 ශබ්දය',
+                soundOn: 'සක්‍රීය',
+                soundOff: 'අක්‍රීය',
+                testSound: 'ශබ්දය පරීක්ෂා කරන්න',
+                language: '🌐 භාෂාව',
+                languageSi: 'සිංහල',
+                languageEn: 'English',
+                searchEngine: '🔍 සෙවුම් එන්ජිම',
+                statusDefault: 'සියලු සැකසුම් සකසා ඇත ✓',
+                statusThemeLight: 'තේමාව වෙනස් විය: ආලෝක මාදිලිය',
+                statusThemeDark: 'තේමාව වෙනස් විය: අඳුරු මාදිලිය',
+                statusAnimationOn: 'සජීවිකරණ සක්‍රීය කර ඇත ✓',
+                statusAnimationOff: 'සජීවිකරණ අක්‍රීය කර ඇත',
+                statusSoundOn: 'ශබ්දය සක්‍රීය කර ඇත 🔊',
+                statusSoundOff: 'ශබ්දය අක්‍රීය කර ඇත 🔇',
+                statusSoundTest: 'ශබ්දය වාදනය වෙමින්... ♪♫',
+                statusSearchEngine: 'සෙවුම් එන්ජිම',
+                statusLanguage: 'භාෂාව වෙනස් විය',
+                alertEmpty: 'කරුණාකර සෙවුම් වචනයක් ඇතුළත් කරන්න!'
+            },
+            en: {
+                logo: 'Search',
+                searchPlaceholder: 'Enter your search...',
+                engineDisplay: 'Current Search Engine',
+                settingsTitle: '⚙️ Settings',
+                theme: '🌓 Theme',
+                themeLight: 'Light Mode',
+                themeDark: 'Dark Mode',
+                animation: '✨ Animation',
+                animationOn: 'Enabled',
+                animationOff: 'Disabled',
+                sound: '🔊 Sound',
+                soundOn: 'Enabled',
+                soundOff: 'Disabled',
+                testSound: 'Test Sound',
+                language: '🌐 Language',
+                languageSi: 'Sinhala',
+                languageEn: 'English',
+                searchEngine: '🔍 Search Engine',
+                statusDefault: 'All settings configured ✓',
+                statusThemeLight: 'Theme changed: Light Mode',
+                statusThemeDark: 'Theme changed: Dark Mode',
+                statusAnimationOn: 'Animation enabled ✓',
+                statusAnimationOff: 'Animation disabled',
+                statusSoundOn: 'Sound enabled 🔊',
+                statusSoundOff: 'Sound disabled 🔇',
+                statusSoundTest: 'Playing sound... ♪♫',
+                statusSearchEngine: 'Search Engine',
+                statusLanguage: 'Language changed',
+                alertEmpty: 'Please enter a search term!'
+            }
+        };
+
+        const searchEngines = {
+            'google': { name: 'Google', url: 'https://www.google.com/search?q=', icon: '🌐' },
+            'bing': { name: 'Bing', url: 'https://www.bing.com/search?q=', icon: '🅱️' },
+            'duckduckgo': { name: 'DuckDuckGo', url: 'https://duckduckgo.com/?q=', icon: '🦆' },
+            'yahoo': { name: 'Yahoo', url: 'https://search.yahoo.com/search?p=', icon: '😁' }
+        };
+
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(frequency = 540, duration = 500) {
+            if (settings.sound === 'off') return;
+            
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = frequency;
+            oscillator.type = 'sine';
+            
+            gainNode.gain.setValueAtTime(0.45, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration / 1000);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + duration / 1000);
+        }
+
+        function updateStatus(message) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.style.animation = 'none';
+            console.log(message);
+            setTimeout(() => {
+                status.style.animation = 'statusPulse 2.5s infinite';
+            }, 10);
+        }
+
+        function updateEngineDisplay() {
+            const engine = searchEngines[settings.search];
+            const lang = translations[settings.language];
+            console.log(engine);
+            document.getElementById('engineDisplay').textContent = 
+                `${lang.engineDisplay}: ${engine.name} ${engine.icon}`;
+        }
+
+        function updateAllText() {
+            const lang = translations[settings.language];
+            
+            document.querySelector('.logo').textContent = lang.logo;
+            document.getElementById('searchInput').placeholder = lang.searchPlaceholder;
+            document.querySelector('.settings-header h2').textContent = lang.settingsTitle;
+            
+            document.querySelectorAll('label')[0].innerHTML = `<span class="icon">${lang.theme.substring(0, 2)}</span>${lang.theme.substring(3)}`;
+            document.querySelectorAll('label')[1].innerHTML = `<span class="icon">${lang.animation.substring(0, 2)}</span>${lang.animation.substring(3)}`;
+            document.querySelectorAll('label')[2].innerHTML = `<span class="icon">${lang.sound.substring(0, 2)}</span>${lang.sound.substring(3)}`;
+            document.querySelectorAll('label')[3].innerHTML = `<span class="icon">${lang.language.substring(0, 2)}</span>${lang.language.substring(3)}`;
+            document.querySelectorAll('label')[4].innerHTML = `<span class="icon">${lang.searchEngine.substring(0, 2)}</span>${lang.searchEngine.substring(3)}`;
+            
+            const themeSelect = document.getElementById('theme');
+            themeSelect.options[0].text = lang.themeLight;
+            themeSelect.options[1].text = lang.themeDark;
+            
+            const animationSelect = document.getElementById('animation');
+            animationSelect.options[0].text = lang.animationOn;
+            animationSelect.options[1].text = lang.animationOff;
+            
+            const soundSelect = document.getElementById('sound');
+            soundSelect.options[0].text = lang.soundOn;
+            soundSelect.options[1].text = lang.soundOff;
+            
+            const languageSelect = document.getElementById('language');
+            languageSelect.options[0].text = lang.languageSi;
+            languageSelect.options[1].text = lang.languageEn;
+            
+            document.querySelector('.test-button').textContent = lang.testSound;
+            document.getElementById('status').textContent = lang.statusDefault;
+            
+            updateEngineDisplay();
+        }
+
+        function openSettings() {
+            playSound(600, 150);
+            document.getElementById('settingsModal').classList.add('active');
+            
+            if (settings.animation === 'on') {
+                document.querySelectorAll('.setting-group').forEach((group, index) => {
+                    group.style.animationDelay = `${index * 0.1}s`;
+                    group.classList.add('animate');
+                });
+            }
+        }
+
+        function closeSettings() {
+            playSound(500, 150);
+            document.getElementById('settingsModal').classList.remove('active');
+        }
+
+        function performSearch() {
+            const query = document.getElementById('searchInput').value.trim();
+            const lang = translations[settings.language];
+            if (query) {
+                playSound(700, 200);
+                const engine = searchEngines[settings.search];
+                window.open(engine.url + encodeURIComponent(query), '_blank');
+            } else {
+                playSound(300, 300);
+                alert(lang.alertEmpty);
+            }
+        }
+
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+
+        document.getElementById('theme').addEventListener('change', function(e) {
+            settings.theme = e.target.value;
+            const lang = translations[settings.language];
+            document.body.className = settings.theme;
+            playSound(settings.theme === 'dark' ? 300 : 500);
+            updateStatus(settings.theme === 'dark' ? lang.statusThemeDark : lang.statusThemeLight);
+        });
+
+        document.getElementById('animation').addEventListener('change', function(e) {
+            settings.animation = e.target.value;
+            const lang = translations[settings.language];
+            playSound(600);
+            
+            const groups = document.querySelectorAll('.setting-group');
+            if (settings.animation === 'on') {
+                groups.forEach(group => group.classList.add('animate'));
+                updateStatus(lang.statusAnimationOn);
+            } else {
+                groups.forEach(group => group.classList.remove('animate'));
+                updateStatus(lang.statusAnimationOff);
+            }
+        });
+
+        document.getElementById('sound').addEventListener('change', function(e) {
+            settings.sound = e.target.value;
+            const lang = translations[settings.language];
+            if (settings.sound === 'on') {
+                playSound(700);
+                updateStatus(lang.statusSoundOn);
+            } else {
+                updateStatus(lang.statusSoundOff);
+            }
+        });
+
+        document.getElementById('language').addEventListener('change', function(e) {
+            settings.language = e.target.value;
+            const lang = translations[settings.language];
+            playSound(650);
+            updateAllText();
+            updateStatus(lang.statusLanguage);
+        });
+
+        document.getElementById('search').addEventListener('change', function(e) {
+            settings.search = e.target.value;
+            const lang = translations[settings.language];
+            playSound(550);
+            const engine = searchEngines[settings.search];
+            updateStatus(`${lang.statusSearchEngine}: ${engine.name} ${engine.icon}`);
+            updateEngineDisplay();
+        });
+
+        function testSound() {
+            const lang = translations[settings.language];
+            playSound(523.25, 150);
+            setTimeout(() => playSound(659.25, 150), 150);
+            setTimeout(() => playSound(783.99, 300), 300);
+            updateStatus(lang.statusSoundTest);
+        }
+
+        document.getElementById('settingsModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeSettings();
+            }
+        });
+
+        // Initialize with English language
+        updateAllText();
+    </script>
+</body>
+</html>
